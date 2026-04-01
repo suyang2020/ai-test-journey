@@ -1,0 +1,56 @@
+
+diff --git a/src/tools/document_reader.py b/src/tools/document_reader.py
+index 3a1b2c4..5d6e7f8 100644
+--- a/src/tools/document_reader.py
++++ b/src/tools/document_reader.py
+@@ -1,6 +1,10 @@
+ import os
++import docx  # 新增：导入 python-docx 库
+ from PyPDF2 import PdfReader
+ 
+ class DocumentReader:
+     """支持读取多种格式文档的工具类"""
+     
++    SUPPORTED_EXTENSIONS = ['.pdf', '.docx', '.txt']
++
+     def __init__(self, file_path):
+         self.file_path = file_path
+         self.extension = os.path.splitext(file_path)[1].lower()
+@@ -15,6 +19,14 @@ class DocumentReader:
+             return self._read_pdf()
+         else:
+             raise ValueError(f"Unsupported file format: {self.extension}")
++    
++    def _read_docx(self):
++        """读取 DOCX 文件内容"""
++        doc = docx.Document(self.file_path)
++        content = []
++        for para in doc.paragraphs:
++            content.append(para.text)
++        return "\n".join(content)
+ 
+     def _read_pdf(self):
+         """读取 PDF 文件内容"""
+diff --git a/src/main.py b/src/main.py
+index 9f8g7h1..2b3c4d5 100644
+--- a/src/main.py
++++ b/src/main.py
+@@ -1,7 +1,8 @@
+ from tools.document_reader import DocumentReader
++import sys
+ 
+ def main():
+-    reader = DocumentReader("./documents/简历.pdf")
++    file_path = sys.argv[1] if len(sys.argv) > 1 else "./documents/简历.pdf"
++    reader = DocumentReader(file_path)
+     try:
+         content = reader.extract_text()
+         print(f"文件内容长度: {len(content)}")
+         print("-" * 30)
+         print(content[:500] + "..." if len(content) > 500 else content)
+     except Exception as e:
+         print(f"读取失败: {e}")
+ 
+ if __name__ == "__main__":
+-    main()
++    main()
