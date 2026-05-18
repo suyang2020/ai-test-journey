@@ -12,3 +12,16 @@ dependencies = [
     "pypdf>=6.1.2",
     "python-docx>=1.2.0",
 ]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.scripts]
+ai-test-suggest = "git_diff_ai_test_analyzer.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/git_diff_ai_test_analyzer"]
+
+[tool.uv]
+package = true
